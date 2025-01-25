@@ -16,7 +16,7 @@ export const Hero = () => {
           className="object-cover w-full h-full"
         >
           <source
-            src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+            src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
             type="video/mp4"
           />
         </video>
