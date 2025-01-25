@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative overflow-hidden bg-cream-light py-24 sm:py-32">
       <div className="container relative">
@@ -12,10 +15,18 @@ export const Hero = () => {
             Découvrez les meilleurs prestataires de mariage haut de gamme et organisez votre événement en toute sérénité.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6 animate-fadeIn">
-            <Button size="lg" className="bg-gold hover:bg-gold-dark">
+            <Button 
+              size="lg" 
+              className="bg-gold hover:bg-gold-dark"
+              onClick={() => navigate('/vendors')}
+            >
               Découvrir les prestataires
             </Button>
-            <Button variant="outline" size="lg">
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => navigate('/how-it-works')}
+            >
               Comment ça marche
             </Button>
           </div>
