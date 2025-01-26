@@ -15,7 +15,6 @@ export const Hero = () => {
   const [budget, setBudget] = useState("");
 
   const handleSearch = () => {
-    // Construire l'URL avec les paramètres de recherche
     const params = new URLSearchParams();
     if (date) params.append("date", date.toISOString());
     if (location) params.append("location", location);
@@ -102,7 +101,7 @@ export const Hero = () => {
                   <select
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
-                    className="w-full h-10 pl-10 pr-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-gold"
+                    className="w-full h-10 pl-10 pr-4 rounded-md border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors hover:bg-accent hover:text-accent-foreground"
                   >
                     <option value="">Budget</option>
                     <option value="10000-20000">10 000€ - 20 000€</option>
@@ -127,7 +126,7 @@ export const Hero = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                className="text-white border-white hover:bg-white/10"
+                className="text-gold border-gold hover:bg-gold/10 hover:text-gold"
                 onClick={() => navigate('/how-it-works')}
               >
                 Comment ça marche
