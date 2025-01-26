@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CalendarIcon, Users, MapPin, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -97,18 +98,18 @@ export const Hero = () => {
 
                 {/* Sélecteur de budget */}
                 <div className="relative">
-                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <select
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    className="w-full h-10 pl-10 pr-4 rounded-md border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors hover:bg-accent hover:text-accent-foreground"
-                  >
-                    <option value="">Budget</option>
-                    <option value="10000-20000">10 000€ - 20 000€</option>
-                    <option value="20000-30000">20 000€ - 30 000€</option>
-                    <option value="30000-50000">30 000€ - 50 000€</option>
-                    <option value="50000+">Plus de 50 000€</option>
-                  </select>
+                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 z-10" />
+                  <Select value={budget} onValueChange={setBudget}>
+                    <SelectTrigger className="w-full pl-10">
+                      <SelectValue placeholder="Budget" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10000-20000">10 000€ - 20 000€</SelectItem>
+                      <SelectItem value="20000-30000">20 000€ - 30 000€</SelectItem>
+                      <SelectItem value="30000-50000">30 000€ - 50 000€</SelectItem>
+                      <SelectItem value="50000+">Plus de 50 000€</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Bouton de recherche */}
