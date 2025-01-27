@@ -4,7 +4,7 @@ import { Hero } from "@/components/home/Hero";
 import { Categories } from "@/components/home/Categories";
 import { FeaturedVendors } from "@/components/home/FeaturedVendors";
 import { ErrorBoundary } from "react-error-boundary";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const ErrorFallback = ({ error }: { error: Error }) => {
   const { toast } = useToast();
@@ -20,8 +20,6 @@ const ErrorFallback = ({ error }: { error: Error }) => {
 };
 
 const Index = () => {
-  console.log("Rendering Index page");
-  
   return (
     <div className="min-h-screen flex flex-col">
       <ErrorBoundary FallbackComponent={ErrorFallback}>
