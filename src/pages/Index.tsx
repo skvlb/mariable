@@ -5,7 +5,12 @@ import { Categories } from "@/components/home/Categories";
 import { FeaturedVendors } from "@/components/home/FeaturedVendors";
 import { ErrorBoundary } from "react-error-boundary";
 
-const ErrorFallback = ({ error }: { error: Error }) => {
+interface ErrorFallbackProps {
+  error: Error;
+  resetErrorBoundary?: () => void;
+}
+
+const ErrorFallback = ({ error }: ErrorFallbackProps) => {
   console.error("Error in Index page:", error);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -15,25 +20,25 @@ const ErrorFallback = ({ error }: { error: Error }) => {
   );
 };
 
-const PageContent = () => {
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-grow">
-        <Hero />
-        <Categories />
-        <FeaturedVendors />
-      </main>
-      <Footer />
-    </div>
-  );
-};
-
 const Index = () => {
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <PageContent />
-    </ErrorBoundary>
+    <div className="min-h-screen flex flex-col">
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Navbar />
+        <main className="flex-grow">
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Hero />
+          </ErrorBoundary>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Categories />
+          </ErrorBoundary>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <FeaturedVendors />
+          </ErrorBoundary>
+        </main>
+        <Footer />
+      </ErrorBoundary>
+    </div>
   );
 };
 
