@@ -308,6 +308,7 @@ export type Database = {
       }
       venue_details: {
         Row: {
+          amenities: Database["public"]["Enums"]["amenity_enum"][] | null
           distance_to_city_center: number | null
           has_accommodation: boolean | null
           has_outdoor_space: boolean | null
@@ -315,8 +316,10 @@ export type Database = {
           indoor_capacity: number | null
           outdoor_capacity: number | null
           parking_capacity: number | null
+          venue_type: Database["public"]["Enums"]["venue_type_enum"][] | null
         }
         Insert: {
+          amenities?: Database["public"]["Enums"]["amenity_enum"][] | null
           distance_to_city_center?: number | null
           has_accommodation?: boolean | null
           has_outdoor_space?: boolean | null
@@ -324,8 +327,10 @@ export type Database = {
           indoor_capacity?: number | null
           outdoor_capacity?: number | null
           parking_capacity?: number | null
+          venue_type?: Database["public"]["Enums"]["venue_type_enum"][] | null
         }
         Update: {
+          amenities?: Database["public"]["Enums"]["amenity_enum"][] | null
           distance_to_city_center?: number | null
           has_accommodation?: boolean | null
           has_outdoor_space?: boolean | null
@@ -333,6 +338,7 @@ export type Database = {
           indoor_capacity?: number | null
           outdoor_capacity?: number | null
           parking_capacity?: number | null
+          venue_type?: Database["public"]["Enums"]["venue_type_enum"][] | null
         }
         Relationships: [
           {
@@ -352,6 +358,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      amenity_enum:
+        | "cuisine_equipee"
+        | "hebergement"
+        | "parking"
+        | "piscine"
+        | "jardin"
+        | "terrasse"
+        | "climatisation"
+        | "wifi"
       cuisine_type:
         | "french"
         | "italian"
@@ -371,6 +386,13 @@ export type Database = {
         | "photography"
         | "videography"
         | "wedding_planning"
+      venue_type_enum:
+        | "chateau"
+        | "domaine"
+        | "hotel"
+        | "restaurant"
+        | "salle_reception"
+        | "plein_air"
     }
     CompositeTypes: {
       [_ in never]: never
