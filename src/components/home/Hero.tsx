@@ -1,26 +1,38 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { SearchBar } from "./search/SearchBar";
+import { useState } from "react";
 
 export const Hero = () => {
   const navigate = useNavigate();
+  const [videoError, setVideoError] = useState(false);
+
+  const handleVideoError = () => {
+    console.error("Error loading video in Hero component");
+    setVideoError(true);
+  };
 
   return (
     <div className="relative h-screen overflow-hidden">
       {/* Vidéo en arrière-plan */}
       <div className="absolute inset-0 w-full h-full">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="object-cover w-full h-full"
-        >
-          <source
-            src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            type="video/mp4"
-          />
-        </video>
+        {!videoError ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            onError={handleVideoError}
+            className="object-cover w-full h-full"
+          >
+            <source
+              src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+              type="video/mp4"
+            />
+          </video>
+        ) : (
+          <div className="w-full h-full bg-gray-900" />
+        )}
         {/* Overlay sombre pour améliorer la lisibilité */}
         <div className="absolute inset-0 bg-black/40" />
       </div>
