@@ -7,7 +7,6 @@ import { ErrorBoundary } from "react-error-boundary";
 
 const ErrorFallback = ({ error }: { error: Error }) => {
   console.error("Error in Index page:", error);
-  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <h2 className="text-2xl font-serif mb-4">Une erreur est survenue</h2>
@@ -16,24 +15,24 @@ const ErrorFallback = ({ error }: { error: Error }) => {
   );
 };
 
+const PageContent = () => {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-grow">
+        <Hero />
+        <Categories />
+        <FeaturedVendors />
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
 const Index = () => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow">
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <Hero />
-          </ErrorBoundary>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <Categories />
-          </ErrorBoundary>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <FeaturedVendors />
-          </ErrorBoundary>
-        </main>
-        <Footer />
-      </div>
+      <PageContent />
     </ErrorBoundary>
   );
 };
