@@ -1,49 +1,47 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { BrowserRouter as Router } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/providers/AuthProvider";
-import Index from "./pages/Index";
-import Vendors from "./pages/Vendors";
-import HowItWorks from "./pages/HowItWorks";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import VendorDetails from "./pages/VendorDetails";
-import Cart from "./pages/Cart";
-import Favorites from "./pages/Favorites";
-import Compare from "./pages/Compare";
-import Chat from "./pages/Chat";
-import Documents from "./pages/Documents";
-import Calendar from "./pages/Calendar";
+import { Toaster } from "@/components/ui/toaster";
+import { Routes, Route } from "react-router-dom";
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import Vendors from "@/pages/Vendors";
+import VendorDetails from "@/pages/VendorDetails";
+import Dashboard from "@/pages/Dashboard";
+import HowItWorks from "@/pages/HowItWorks";
+import Calendar from "@/pages/Calendar";
+import Documents from "@/pages/Documents";
+import Compare from "@/pages/Compare";
+import Favorites from "@/pages/Favorites";
+import Cart from "@/pages/Cart";
+import Chat from "@/pages/Chat";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+function App() {
+  return (
+    <Router>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/vendors" element={<Vendors />} />
             <Route path="/vendors/:id" element={<VendorDetails />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/favorites" element={<Favorites />} />
-            <Route path="/compare" element={<Compare />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/documents" element={<Documents />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/calendar" element={<Calendar />} />
+            <Route path="/documents" element={<Documents />} />
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/chat" element={<Chat />} />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+          <Toaster />
+        </AuthProvider>
+      </QueryClientProvider>
+    </Router>
+  );
+}
 
 export default App;
