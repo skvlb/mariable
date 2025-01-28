@@ -21,6 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
+import { Navbar } from "@/components/layout/Navbar";
 
 const Auth = () => {
   const { signIn, signUp } = useAuth();
@@ -62,15 +63,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="container flex items-center justify-center min-h-screen py-8">
-      <Card className="w-full max-w-lg">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-serif">Bienvenue sur Mariable</CardTitle>
-          <CardDescription>
-            La plateforme qui simplifie l'organisation de votre mariage
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="min-h-screen flex flex-col bg-background">
+      <Navbar />
+      <div className="flex-1 container flex items-center justify-center py-8">
+        <Card className="w-full max-w-lg">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-serif">Bienvenue sur Mariable</CardTitle>
+            <CardDescription>
+              La plateforme qui simplifie l'organisation de votre mariage
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
           <Tabs defaultValue="login" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Connexion</TabsTrigger>
@@ -230,8 +233,9 @@ const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
