@@ -32,7 +32,7 @@ export const SearchBar = () => {
     <div className="p-6 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Select value={vendorType} onValueChange={setVendorType}>
-          <SelectTrigger>
+          <SelectTrigger className="text-center">
             <SelectValue placeholder="Type de prestataire" />
           </SelectTrigger>
           <SelectContent>
@@ -47,7 +47,7 @@ export const SearchBar = () => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-full justify-start text-left font-normal"
+              className="w-full justify-center text-center font-normal"
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {date ? (
@@ -75,7 +75,7 @@ export const SearchBar = () => {
             placeholder="Lieu du mariage"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-center"
           />
         </div>
 
@@ -86,13 +86,13 @@ export const SearchBar = () => {
             placeholder="Nombre d'invités"
             value={guestCount}
             onChange={(e) => setGuestCount(e.target.value)}
-            className="pl-10"
+            className="pl-10 text-center"
             min="0"
           />
         </div>
 
         <Select value={budget} onValueChange={setBudget}>
-          <SelectTrigger>
+          <SelectTrigger className="text-center">
             <SelectValue placeholder="Budget" />
           </SelectTrigger>
           <SelectContent>
