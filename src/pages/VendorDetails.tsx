@@ -55,9 +55,13 @@ const VendorDetails = () => {
         .from('vendors')
         .select(`
           *,
-          catering_details(*),
+          catering_details(
+            *,
+            catering_dietary_options(*)
+          ),
           venue_details(*),
-          vendor_services(*)
+          vendor_services(*),
+          reviews(*)
         `)
         .eq('id', id)
         .maybeSingle();
@@ -68,7 +72,7 @@ const VendorDetails = () => {
       }
 
       console.log('Fetched vendor:', data);
-      return data as VendorWithRelations;
+      return data;
     },
     enabled: !!id
   });
