@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Calendar, Heart, MapPin, Euro, Users, Phone, Mail, Star } from "lucide-react";
+import { ChatBot } from "@/components/vendor/ChatBot";
 
 // Define a type for the vendor with its relations
 type VendorWithRelations = {
@@ -164,6 +165,12 @@ const VendorDetails = () => {
                   </div>
                 </section>
               )}
+
+              {/* Chat Bot */}
+              <section>
+                <h2 className="text-2xl font-serif mb-4">Questions & Réponses</h2>
+                <ChatBot vendor={vendor} />
+              </section>
             </div>
 
             {/* Sidebar */}
