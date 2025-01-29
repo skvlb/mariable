@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { BackButton } from "@/components/ui/BackButton";
 
 const steps = [
   {
@@ -27,6 +28,7 @@ const HowItWorks = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <BackButton />
       <main className="flex-grow">
         <div className="container mx-auto py-16">
           <h1 className="font-serif text-4xl font-medium text-center mb-12">Comment ça marche</h1>

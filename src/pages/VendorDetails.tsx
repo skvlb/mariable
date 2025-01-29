@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Calendar, Heart, MapPin, Euro, Users, Phone, Mail, Star } from "lucide-react";
 import { ChatBot } from "@/components/vendor/ChatBot";
+import { BackButton } from "@/components/ui/BackButton";
 
 // Define a type for the vendor with its relations
 type VendorWithRelations = {
@@ -114,6 +115,7 @@ const VendorDetails = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <BackButton />
       <main className="flex-grow">
         {/* Hero Section */}
         <div className="h-[400px] relative bg-gray-100">

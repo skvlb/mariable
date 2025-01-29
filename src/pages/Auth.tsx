@@ -3,6 +3,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
+import { BackButton } from "@/components/ui/BackButton";
 import {
   Card,
   CardContent,
@@ -65,6 +66,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
+      <BackButton />
       <div className="flex-1 container flex items-center justify-center py-8">
         <Card className="w-full max-w-lg">
           <CardHeader className="space-y-1">

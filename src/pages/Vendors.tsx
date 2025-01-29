@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
+import { BackButton } from "@/components/ui/BackButton";
 
 const Vendors = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,6 +45,7 @@ const Vendors = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <BackButton />
       <main className="flex-grow bg-cream-light">
         <div className="container mx-auto py-12">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
