@@ -19,6 +19,9 @@ serve(async (req) => {
       throw new Error('Missing Gemini API key')
     }
 
+    console.log('Processing request with message:', message)
+    console.log('Vendor context:', vendorContext)
+
     const systemPrompt = `Tu es un assistant spécialisé dans les mariages qui aide les utilisateurs à obtenir des informations sur ${vendorContext.name}, un prestataire de mariage. 
     Voici les informations dont tu disposes sur ce prestataire :
     - Catégorie : ${vendorContext.category}
@@ -50,49 +53,34 @@ serve(async (req) => {
             role: 'user',
             parts: [{ text: message }]
           }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 1024,
-        },
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          }
         ]
       })
     })
 
-    const data = await response.json()
-    console.log('Gemini response:', data)
-
-    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-      return new Response(
-        JSON.stringify({ response: data.candidates[0].content.parts[0].text }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    } else {
-      throw new Error('Invalid response from Gemini API')
+    if (!response.ok) {
+      console.error('Gemini API error:', await response.text())
+      throw new Error(`Gemini API returned status ${response.status}`)
     }
+
+    const data = await response.json()
+    console.log('Gemini API response:', JSON.stringify(data))
+
+    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      console.error('Invalid Gemini API response structure:', data)
+      throw new Error('Unexpected response structure from Gemini API')
+    }
+
+    return new Response(
+      JSON.stringify({ response: data.candidates[0].content.parts[0].text }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
   } catch (error) {
     console.error('Error in chat-with-gemini function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
