@@ -5,7 +5,43 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Calendar, Heart, MapPin, Euro, Users, Phone, Mail, Star } from "lucide-react";
-import { Tables } from "@/integrations/supabase/types";
+
+// Define a type for the vendor with its relations
+type VendorWithRelations = {
+  id: string;
+  name: string;
+  category: string;
+  description: string | null;
+  short_description: string | null;
+  location: string;
+  address: string | null;
+  rating: number | null;
+  review_count: number | null;
+  price_range_min: number | null;
+  price_range_max: number | null;
+  capacity_min: number | null;
+  capacity_max: number | null;
+  catering_details?: {
+    cuisine_type: string | null;
+    includes_service_staff: boolean | null;
+    includes_equipment: boolean | null;
+    offers_tasting: boolean | null;
+  } | null;
+  venue_details?: {
+    has_accommodation: boolean | null;
+    has_outdoor_space: boolean | null;
+    parking_capacity: number | null;
+    indoor_capacity: number | null;
+    outdoor_capacity: number | null;
+  } | null;
+  vendor_services?: Array<{
+    id: string;
+    name: string;
+    description: string | null;
+    base_price: number | null;
+    is_optional: boolean | null;
+  }>;
+}
 
 const VendorDetails = () => {
   const { id } = useParams();
@@ -23,7 +59,7 @@ const VendorDetails = () => {
           vendor_services(*)
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching vendor:', error);
@@ -31,8 +67,9 @@ const VendorDetails = () => {
       }
 
       console.log('Fetched vendor:', data);
-      return data as Tables<'vendors'>;
-    }
+      return data as VendorWithRelations;
+    },
+    enabled: !!id
   });
 
   if (isLoading) {
@@ -110,21 +147,23 @@ const VendorDetails = () => {
               </section>
 
               {/* Services */}
-              <section>
-                <h2 className="text-2xl font-serif mb-4">Services proposés</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {vendor.vendor_services?.map((service) => (
-                    <div key={service.id} className="p-4 border rounded-lg">
-                      <h3 className="font-medium mb-2">{service.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">{service.description}</p>
-                      <p className="text-sm font-medium">
-                        À partir de {service.base_price}€
-                        {service.is_optional && " (optionnel)"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
+              {vendor.vendor_services && vendor.vendor_services.length > 0 && (
+                <section>
+                  <h2 className="text-2xl font-serif mb-4">Services proposés</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {vendor.vendor_services.map((service) => (
+                      <div key={service.id} className="p-4 border rounded-lg">
+                        <h3 className="font-medium mb-2">{service.name}</h3>
+                        <p className="text-sm text-gray-600 mb-2">{service.description}</p>
+                        <p className="text-sm font-medium">
+                          À partir de {service.base_price}€
+                          {service.is_optional && " (optionnel)"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
 
             {/* Sidebar */}
