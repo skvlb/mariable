@@ -1,75 +1,45 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { VendorCard } from "@/components/ui/VendorCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
-
-// Mock data with the correct type structure
-const mockVendors: Tables<"vendors">[] = [
-  {
-    id: "1",
-    name: "Château de Vaux-le-Vicomte",
-    category: "venue",
-    description: "Un cadre exceptionnel pour votre mariage, à seulement 55km de Paris",
-    short_description: "Un cadre exceptionnel pour votre mariage",
-    location: "Maincy",
-    address: "Château de Vaux-le-Vicomte, 77950 Maincy",
-    latitude: 48.5667,
-    longitude: 2.7167,
-    rating: 4.8,
-    review_count: 150,
-    price_range_min: 15000,
-    price_range_max: 50000,
-    capacity_min: 50,
-    capacity_max: 500,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    name: "Maison Lenôtre",
-    category: "catering",
-    description: "Excellence gastronomique et service sur-mesure pour votre réception",
-    short_description: "Excellence gastronomique et service sur-mesure",
-    location: "Paris",
-    address: "44 Rue d'Auteuil, 75016 Paris",
-    latitude: 48.8566,
-    longitude: 2.3522,
-    rating: 4.9,
-    review_count: 200,
-    price_range_min: 180,
-    price_range_max: 350,
-    capacity_min: 20,
-    capacity_max: 1000,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    name: "Studio Cabrelli",
-    category: "photography",
-    description: "Capturez les moments magiques de votre journée avec notre équipe expérimentée",
-    short_description: "Capturez les moments magiques de votre journée",
-    location: "Paris",
-    address: "15 Rue de la Photographie, 75008 Paris",
-    latitude: 48.8744,
-    longitude: 2.3156,
-    rating: 4.7,
-    review_count: 75,
-    price_range_min: 2500,
-    price_range_max: 5000,
-    capacity_min: null,
-    capacity_max: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
 
 const Vendors = () => {
   const [searchTerm, setSearchTerm] = useState("");
+
+  const { data: vendors, isLoading } = useQuery({
+    queryKey: ['vendors'],
+    queryFn: async () => {
+      console.log('Fetching vendors...');
+      const { data, error } = await supabase
+        .from('vendors')
+        .select(`
+          *,
+          catering_details(*),
+          venue_details(*),
+          vendor_services(*)
+        `);
+
+      if (error) {
+        console.error('Error fetching vendors:', error);
+        throw error;
+      }
+
+      console.log('Fetched vendors:', data);
+      return data as Tables<"vendors">[];
+    }
+  });
+
+  const filteredVendors = vendors?.filter((vendor) =>
+    vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vendor.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vendor.location.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -96,16 +66,23 @@ const Vendors = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {mockVendors
-              .filter((vendor) =>
-                vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                vendor.category.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((vendor) => (
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="animate-pulse">
+                  <div className="h-64 bg-gray-200 rounded-lg mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredVendors?.map((vendor) => (
                 <VendorCard key={vendor.id} vendor={vendor} />
               ))}
-          </div>
+            </div>
+          )}
         </div>
       </main>
       <Footer />
