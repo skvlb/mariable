@@ -21,13 +21,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check active sessions and sets the user
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for changes on auth state
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -38,7 +36,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, userData: any) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      // 1. Create the auth user first
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -49,14 +48,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         },
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("No user data returned");
 
-      // Create profile
+      // 2. Now create the profile
       const { error: profileError } = await supabase
         .from('profiles')
         .insert([
           {
-            id: user?.id,
+            id: authData.user.id,
             first_name: userData.firstName,
             last_name: userData.lastName,
             wedding_date: userData.weddingDate,
@@ -66,7 +66,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           },
         ]);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        // If profile creation fails, we should delete the auth user
+        await supabase.auth.signOut();
+        throw new Error("Failed to create profile");
+      }
 
       toast({
         title: "Compte créé avec succès",
@@ -75,6 +80,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       navigate('/auth');
     } catch (error: any) {
+      console.error("Signup error:", error);
       toast({
         title: "Erreur lors de l'inscription",
         description: error.message,
