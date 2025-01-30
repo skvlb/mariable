@@ -36,35 +36,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, userData: any) => {
     try {
-      // 1. Create the auth user first
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            first_name: userData.firstName,
-            last_name: userData.lastName,
-          },
-        },
       });
 
       if (authError) throw authError;
       if (!authData.user) throw new Error("No user data returned");
 
-      // 2. Now create the profile
+      // Create the profile after successful signup
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert([
-          {
-            id: authData.user.id,
-            first_name: userData.firstName,
-            last_name: userData.lastName,
-            wedding_date: userData.weddingDate,
-            wedding_location: userData.weddingLocation,
-            estimated_budget: userData.estimatedBudget,
-            guest_count: userData.guestCount,
-          },
-        ]);
+        .insert({
+          id: authData.user.id,
+          first_name: userData.firstName,
+          last_name: userData.lastName,
+          wedding_date: userData.weddingDate,
+          wedding_location: userData.weddingLocation,
+          estimated_budget: userData.estimatedBudget,
+          guest_count: userData.guestCount,
+        });
 
       if (profileError) {
         console.error("Profile creation error:", profileError);
