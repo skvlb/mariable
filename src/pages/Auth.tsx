@@ -82,16 +82,17 @@ const Auth = () => {
         if (error.message === "Invalid login credentials") {
           toast({
             title: "Échec de la connexion",
-            description: "Email ou mot de passe incorrect",
+            description: "Email ou mot de passe incorrect. Si vous n'avez pas encore de compte, veuillez vous inscrire d'abord.",
             variant: "destructive",
           });
         } else {
           toast({
             title: "Erreur",
-            description: "Une erreur est survenue lors de la connexion",
+            description: "Une erreur est survenue lors de la connexion. Veuillez réessayer.",
             variant: "destructive",
           });
         }
+        console.error("Login error details:", error);
       } else {
         toast({
           title: "Connexion réussie",
@@ -103,7 +104,7 @@ const Auth = () => {
       console.error("Login error:", error);
       toast({
         title: "Erreur de connexion",
-        description: "Une erreur inattendue est survenue",
+        description: "Une erreur inattendue est survenue. Veuillez réessayer.",
         variant: "destructive",
       });
     } finally {
