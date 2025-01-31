@@ -24,11 +24,13 @@ import { fr } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const { signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   // Login state
   const [loginEmail, setLoginEmail] = useState("");
@@ -44,27 +46,64 @@ const Auth = () => {
   const [estimatedBudget, setEstimatedBudget] = useState("");
   const [guestCount, setGuestCount] = useState("");
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (!loginEmail || !loginPassword) {
-      toast({
-        title: "Erreur de connexion",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      await signIn(loginEmail, loginPassword);
+      // Validate email format
+      if (!validateEmail(loginEmail)) {
+        toast({
+          title: "Format d'email invalide",
+          description: "Veuillez entrer une adresse email valide",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate password length
+      if (loginPassword.length < 6) {
+        toast({
+          title: "Mot de passe trop court",
+          description: "Le mot de passe doit contenir au moins 6 caractères",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await signIn(loginEmail, loginPassword);
+      
+      if (error) {
+        if (error.message === "Invalid login credentials") {
+          toast({
+            title: "Échec de la connexion",
+            description: "Email ou mot de passe incorrect",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Erreur",
+            description: "Une erreur est survenue lors de la connexion",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Connexion réussie",
+          description: "Vous êtes maintenant connecté",
+        });
+        navigate("/");
+      }
     } catch (error: any) {
       console.error("Login error:", error);
       toast({
         title: "Erreur de connexion",
-        description: "Email ou mot de passe incorrect",
+        description: "Une erreur inattendue est survenue",
         variant: "destructive",
       });
     } finally {
@@ -77,24 +116,52 @@ const Auth = () => {
     setIsLoading(true);
     
     try {
+      // Validate email format
+      if (!validateEmail(email)) {
+        throw new Error("Format d'email invalide");
+      }
+
+      // Validate password length
+      if (password.length < 6) {
+        throw new Error("Le mot de passe doit contenir au moins 6 caractères");
+      }
+
       if (!weddingDate) {
         throw new Error("La date de mariage est requise");
       }
 
-      if (!email || !password || !firstName || !lastName || !weddingLocation || !estimatedBudget || !guestCount) {
+      if (!firstName || !lastName || !weddingLocation || !estimatedBudget || !guestCount) {
         throw new Error("Veuillez remplir tous les champs obligatoires");
       }
 
       const userData = {
         firstName,
         lastName,
-        weddingDate,
+        weddingDate: format(weddingDate, 'yyyy-MM-dd'),
         weddingLocation,
         estimatedBudget: parseInt(estimatedBudget),
         guestCount: parseInt(guestCount),
       };
 
-      await signUp(email, password, userData);
+      const { error } = await signUp(email, password, userData);
+
+      if (error) {
+        if (error.message.includes("already registered")) {
+          toast({
+            title: "Erreur d'inscription",
+            description: "Cette adresse email est déjà utilisée",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Inscription réussie",
+          description: "Votre compte a été créé avec succès",
+        });
+        navigate("/");
+      }
     } catch (error: any) {
       console.error("Registration error:", error);
       toast({
