@@ -1,23 +1,26 @@
-import { Heart, ShoppingCart, User, LogOut } from "lucide-react";
+import { Heart, ShoppingCart, User, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const handleAuthClick = () => {
-    if (user) {
-      signOut();
-      toast({
-        title: "Déconnexion réussie",
-        description: "À bientôt !",
-      });
-    } else {
-      navigate("/auth");
-    }
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Déconnexion réussie",
+      description: "À bientôt !",
+    });
+    navigate('/');
   };
 
   return (
@@ -38,13 +41,32 @@ export const Navbar = () => {
               <ShoppingCart className="h-5 w-5" />
             </Button>
           </Link>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={handleAuthClick}
-          >
-            {user ? <LogOut className="h-5 w-5" /> : <User className="h-5 w-5" />}
-          </Button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  Votre profil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut}>
+                  Se déconnecter
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => navigate("/auth")}
+            >
+              <User className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       </div>
     </nav>

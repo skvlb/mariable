@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface AuthContextType {
   user: User | null;
@@ -85,13 +85,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Bienvenue sur Mariable !",
       });
 
-      navigate('/dashboard');
+      navigate('/');
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     }
   };
 
@@ -100,11 +101,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      toast({
-        title: "Déconnexion réussie",
-        description: "À bientôt !",
-      });
-
       navigate('/');
     } catch (error: any) {
       toast({
@@ -112,6 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     }
   };
 
@@ -130,6 +127,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     }
   };
 

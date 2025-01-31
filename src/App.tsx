@@ -15,6 +15,7 @@ import Compare from "@/pages/Compare";
 import Favorites from "@/pages/Favorites";
 import Cart from "@/pages/Cart";
 import Chat from "@/pages/Chat";
+import Profile from "@/pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
           <Toaster />
         </AuthProvider>
