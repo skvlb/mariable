@@ -7,8 +7,8 @@ import { toast } from "@/hooks/use-toast";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, userData: any) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ error: any | null }>;
+  signUp: (email: string, password: string, userData: any) => Promise<{ error: any | null }>;
   signOut: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
 }
@@ -51,8 +51,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error("No user data returned");
+      if (authError) return { error: authError };
+      if (!authData.user) return { error: new Error("No user data returned") };
 
       toast({
         title: "Compte créé avec succès",
@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       navigate('/auth');
+      return { error: null };
     } catch (error: any) {
       console.error("Signup error:", error);
       toast({
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: error.message,
         variant: "destructive",
       });
-      throw error;
+      return { error };
     }
   };
 
@@ -78,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         password,
       });
 
-      if (error) throw error;
+      if (error) return { error };
 
       toast({
         title: "Connexion réussie",
@@ -86,13 +87,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       navigate('/');
+      return { error: null };
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
         description: error.message,
         variant: "destructive",
       });
-      throw error;
+      return { error };
     }
   };
 
