@@ -33,13 +33,13 @@ export const SearchBar = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Select value={vendorType} onValueChange={setVendorType}>
           <SelectTrigger className="text-center w-full">
-            <SelectValue placeholder="Type de prestataire" className="text-center" />
+            <SelectValue placeholder="Type de prestataire" className="truncate" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="venue" className="text-center">Lieu de réception</SelectItem>
-            <SelectItem value="catering" className="text-center">Traiteur</SelectItem>
-            <SelectItem value="photo" className="text-center">Photographe/Vidéaste</SelectItem>
-            <SelectItem value="planner" className="text-center">Wedding Planner</SelectItem>
+            <SelectItem value="venue">Lieu de réception</SelectItem>
+            <SelectItem value="catering">Traiteur</SelectItem>
+            <SelectItem value="photo">Photographe/Vidéaste</SelectItem>
+            <SelectItem value="planner">Wedding Planner</SelectItem>
           </SelectContent>
         </Select>
 
@@ -47,7 +47,7 @@ export const SearchBar = () => {
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-full justify-center text-center font-normal"
+              className="w-full justify-center text-center font-normal truncate"
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {date ? (
@@ -75,7 +75,7 @@ export const SearchBar = () => {
             placeholder="Lieu du mariage"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="pl-10 text-center w-full"
+            className="pl-10 text-center truncate w-full"
           />
         </div>
 
@@ -86,20 +86,20 @@ export const SearchBar = () => {
             placeholder="Nombre d'invités"
             value={guestCount}
             onChange={(e) => setGuestCount(e.target.value)}
-            className="pl-10 text-center w-full"
+            className="pl-10 text-center truncate w-full"
             min="0"
           />
         </div>
 
         <Select value={budget} onValueChange={setBudget}>
           <SelectTrigger className="text-center w-full">
-            <SelectValue placeholder="Budget" className="text-center" />
+            <SelectValue placeholder="Budget" className="truncate" />
           </SelectTrigger>
-          <SelectContent className="w-full">
-            <SelectItem value="10000-20000" className="text-center">10 000€ - 20 000€</SelectItem>
-            <SelectItem value="20000-30000" className="text-center">20 000€ - 30 000€</SelectItem>
-            <SelectItem value="30000-50000" className="text-center">30 000€ - 50 000€</SelectItem>
-            <SelectItem value="50000+" className="text-center">Plus de 50 000€</SelectItem>
+          <SelectContent>
+            <SelectItem value="10000-20000">10 000€ - 20 000€</SelectItem>
+            <SelectItem value="20000-30000">20 000€ - 30 000€</SelectItem>
+            <SelectItem value="30000-50000">30 000€ - 50 000€</SelectItem>
+            <SelectItem value="50000+">Plus de 50 000€</SelectItem>
           </SelectContent>
         </Select>
       </div>
