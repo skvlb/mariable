@@ -73,7 +73,7 @@ const Profile = () => {
         .update({
           first_name: firstName,
           last_name: lastName,
-          wedding_date: weddingDate,
+          wedding_date: weddingDate ? format(weddingDate, 'yyyy-MM-dd') : null,
           wedding_location: weddingLocation,
           estimated_budget: parseInt(estimatedBudget),
           guest_count: parseInt(guestCount),
