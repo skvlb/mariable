@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
+import { toast } from "@/components/ui/use-toast";
 
 const Auth = () => {
   const { signIn, signUp } = useAuth();
@@ -45,22 +46,55 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await signIn(loginEmail, loginPassword);
-    setIsLoading(false);
+    try {
+      await signIn(loginEmail, loginPassword);
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue sur Mariable !",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur de connexion",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await signUp(email, password, {
-      firstName,
-      lastName,
-      weddingDate,
-      weddingLocation,
-      estimatedBudget: parseInt(estimatedBudget),
-      guestCount: parseInt(guestCount),
-    });
-    setIsLoading(false);
+    
+    try {
+      if (!weddingDate) {
+        throw new Error("La date de mariage est requise");
+      }
+
+      const userData = {
+        firstName,
+        lastName,
+        weddingDate,
+        weddingLocation,
+        estimatedBudget: parseInt(estimatedBudget),
+        guestCount: parseInt(guestCount),
+      };
+
+      await signUp(email, password, userData);
+      toast({
+        title: "Inscription réussie",
+        description: "Votre compte a été créé avec succès !",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erreur lors de l'inscription",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -76,165 +110,165 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-          <Tabs defaultValue="login" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Connexion</TabsTrigger>
-              <TabsTrigger value="register">Inscription</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="exemple@email.com"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Mot de passe</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Connexion..." : "Se connecter"}
-                </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="register">
-              <form onSubmit={handleRegister} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+            <Tabs defaultValue="login" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Connexion</TabsTrigger>
+                <TabsTrigger value="register">Inscription</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="login">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">Prénom</Label>
+                    <Label htmlFor="login-email">Email</Label>
                     <Input
-                      id="firstName"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      id="login-email"
+                      type="email"
+                      placeholder="exemple@email.com"
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Nom</Label>
+                    <Label htmlFor="login-password">Mot de passe</Label>
                     <Input
-                      id="lastName"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
+                      id="login-password"
+                      type="password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
                       required
                     />
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="exemple@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Date du mariage</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {weddingDate ? (
-                          format(weddingDate, "dd MMMM yyyy", { locale: fr })
-                        ) : (
-                          <span>Choisir une date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={weddingDate}
-                        onSelect={setWeddingDate}
-                        initialFocus
-                        locale={fr}
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Connexion..." : "Se connecter"}
+                  </Button>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="register">
+                <form onSubmit={handleRegister} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">Prénom</Label>
+                      <Input
+                        id="firstName"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
                       />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location">Lieu du mariage</Label>
-                  <Input
-                    id="location"
-                    value={weddingLocation}
-                    onChange={(e) => setWeddingLocation(e.target.value)}
-                    placeholder="Ville ou région"
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Nom</Label>
+                      <Input
+                        id="lastName"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="budget">Budget estimé (€)</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      id="budget"
-                      type="number"
-                      value={estimatedBudget}
-                      onChange={(e) => setEstimatedBudget(e.target.value)}
-                      placeholder="30000"
+                      id="email"
+                      type="email"
+                      placeholder="exemple@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="guests">Nombre d'invités</Label>
+                    <Label htmlFor="password">Mot de passe</Label>
                     <Input
-                      id="guests"
-                      type="number"
-                      value={guestCount}
-                      onChange={(e) => setGuestCount(e.target.value)}
-                      placeholder="100"
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Création du compte..." : "Créer un compte"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+                  
+                  <div className="space-y-2">
+                    <Label>Date du mariage</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {weddingDate ? (
+                            format(weddingDate, "dd MMMM yyyy", { locale: fr })
+                          ) : (
+                            <span>Choisir une date</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={weddingDate}
+                          onSelect={setWeddingDate}
+                          initialFocus
+                          locale={fr}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Lieu du mariage</Label>
+                    <Input
+                      id="location"
+                      value={weddingLocation}
+                      onChange={(e) => setWeddingLocation(e.target.value)}
+                      placeholder="Ville ou région"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="budget">Budget estimé (€)</Label>
+                      <Input
+                        id="budget"
+                        type="number"
+                        value={estimatedBudget}
+                        onChange={(e) => setEstimatedBudget(e.target.value)}
+                        placeholder="30000"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="guests">Nombre d'invités</Label>
+                      <Input
+                        id="guests"
+                        type="number"
+                        value={guestCount}
+                        onChange={(e) => setGuestCount(e.target.value)}
+                        placeholder="100"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Création du compte..." : "Créer un compte"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>

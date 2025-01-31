@@ -39,30 +39,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            weddingDate: userData.weddingDate,
+            weddingLocation: userData.weddingLocation,
+            estimatedBudget: userData.estimatedBudget,
+            guestCount: userData.guestCount,
+          }
+        }
       });
 
       if (authError) throw authError;
       if (!authData.user) throw new Error("No user data returned");
-
-      // Create the profile after successful signup
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          wedding_date: userData.weddingDate,
-          wedding_location: userData.weddingLocation,
-          estimated_budget: userData.estimatedBudget,
-          guest_count: userData.guestCount,
-        });
-
-      if (profileError) {
-        console.error("Profile creation error:", profileError);
-        // If profile creation fails, we should delete the auth user
-        await supabase.auth.signOut();
-        throw new Error("Failed to create profile");
-      }
 
       toast({
         title: "Compte créé avec succès",
@@ -77,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     }
   };
 
