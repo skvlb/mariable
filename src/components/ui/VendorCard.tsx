@@ -1,75 +1,136 @@
-import { Heart, MapPin, Euro, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Link } from "react-router-dom";
+import { Heart } from "lucide-react";
 import { Tables } from "@/integrations/supabase/types";
-import { useNavigate } from "react-router-dom";
-
-type Vendor = Tables<"vendors">;
+import { Button } from "./button";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface VendorCardProps {
-  vendor: Vendor;
+  vendor: Tables<"vendors">;
 }
 
 export const VendorCard = ({ vendor }: VendorCardProps) => {
-  const navigate = useNavigate();
-  
-  // Default image if none provided
-  const imageUrl = "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80";
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch favorite status
+  const { data: isFavorite } = useQuery({
+    queryKey: ['favorite', vendor.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('favorites')
+        .select('id')
+        .eq('vendor_id', vendor.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking favorite status:', error);
+        return false;
+      }
+
+      return !!data;
+    }
+  });
+
+  // Add to favorites mutation
+  const addToFavorites = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('favorites')
+        .insert([{ vendor_id: vendor.id }]);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['favorite', vendor.id] });
+      toast({
+        title: "Ajouté aux favoris",
+        description: `${vendor.name} a été ajouté à vos favoris.`
+      });
+    },
+    onError: (error) => {
+      console.error('Error adding to favorites:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'ajout aux favoris.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Remove from favorites mutation
+  const removeFromFavorites = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('vendor_id', vendor.id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['favorite', vendor.id] });
+      toast({
+        title: "Retiré des favoris",
+        description: `${vendor.name} a été retiré de vos favoris.`
+      });
+    },
+    onError: (error) => {
+      console.error('Error removing from favorites:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la suppression des favoris.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const toggleFavorite = () => {
+    if (isFavorite) {
+      removeFromFavorites.mutate();
+    } else {
+      addToFavorites.mutate();
+    }
+  };
 
   return (
-    <Card className="overflow-hidden group">
-      <CardHeader className="p-0 relative">
-        <img
-          src={imageUrl}
-          alt={vendor.name}
-          className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 right-4 bg-white/80 hover:bg-white"
-        >
-          <Heart className="h-5 w-5" />
-        </Button>
-      </CardHeader>
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 className="font-serif text-xl">{vendor.name}</h3>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <MapPin className="h-4 w-4" />
-              <span className="capitalize">{vendor.location}</span>
-            </div>
-          </div>
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-1 text-sm">
-              <Euro className="h-4 w-4" />
-              <span>
-                {vendor.price_range_min && vendor.price_range_max
-                  ? `${vendor.price_range_min}€ - ${vendor.price_range_max}€`
-                  : "Prix sur demande"}
-              </span>
-            </div>
-            {vendor.capacity_min && vendor.capacity_max && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                <Users className="h-4 w-4" />
-                <span>{vendor.capacity_min} - {vendor.capacity_max} pers.</span>
-              </div>
-            )}
-          </div>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <Link to={`/vendors/${vendor.id}`}>
+        <div className="h-48 bg-gray-200">
+          <img
+            src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7"
+            alt={vendor.name}
+            className="w-full h-full object-cover"
+          />
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {vendor.short_description || vendor.description}
-        </p>
-      </CardContent>
-      <CardFooter className="p-6 pt-0">
-        <Button 
-          className="w-full bg-gold hover:bg-gold-dark"
-          onClick={() => navigate(`/vendors/${vendor.id}`)}
-        >
-          Voir le détail
-        </Button>
-      </CardFooter>
-    </Card>
+      </Link>
+      <div className="p-4">
+        <div className="flex justify-between items-start mb-2">
+          <Link to={`/vendors/${vendor.id}`}>
+            <h3 className="text-lg font-medium hover:text-primary transition-colors">
+              {vendor.name}
+            </h3>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.preventDefault();
+              toggleFavorite();
+            }}
+            className={`${
+              isFavorite ? "text-red-500 hover:text-red-600" : "text-gray-400 hover:text-gray-500"
+            }`}
+          >
+            <Heart className={`h-5 w-5 ${isFavorite ? "fill-current" : ""}`} />
+          </Button>
+        </div>
+        <p className="text-sm text-gray-600 mb-2">{vendor.location}</p>
+        <p className="text-sm text-gray-500">{vendor.short_description}</p>
+      </div>
+    </div>
   );
 };
