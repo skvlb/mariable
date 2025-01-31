@@ -5,6 +5,7 @@ import { Button } from "./button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/providers/AuthProvider";
 
 interface VendorCardProps {
   vendor: Tables<"vendors">;
@@ -13,32 +14,42 @@ interface VendorCardProps {
 export const VendorCard = ({ vendor }: VendorCardProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // Fetch favorite status
   const { data: isFavorite } = useQuery({
     queryKey: ['favorite', vendor.id],
     queryFn: async () => {
+      if (!user) return false;
+
       const { data, error } = await supabase
         .from('favorites')
         .select('id')
         .eq('vendor_id', vendor.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('Error checking favorite status:', error);
         return false;
       }
 
       return !!data;
-    }
+    },
+    enabled: !!user,
   });
 
   // Add to favorites mutation
   const addToFavorites = useMutation({
     mutationFn: async () => {
+      if (!user) throw new Error('User must be logged in');
+
       const { error } = await supabase
         .from('favorites')
-        .insert([{ vendor_id: vendor.id }]);
+        .insert([{ 
+          vendor_id: vendor.id,
+          user_id: user.id 
+        }]);
 
       if (error) throw error;
     },
@@ -63,10 +74,13 @@ export const VendorCard = ({ vendor }: VendorCardProps) => {
   // Remove from favorites mutation
   const removeFromFavorites = useMutation({
     mutationFn: async () => {
+      if (!user) throw new Error('User must be logged in');
+
       const { error } = await supabase
         .from('favorites')
         .delete()
-        .eq('vendor_id', vendor.id);
+        .eq('vendor_id', vendor.id)
+        .eq('user_id', user.id);
 
       if (error) throw error;
     },
@@ -89,6 +103,15 @@ export const VendorCard = ({ vendor }: VendorCardProps) => {
   });
 
   const toggleFavorite = () => {
+    if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour ajouter des favoris.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (isFavorite) {
       removeFromFavorites.mutate();
     } else {
