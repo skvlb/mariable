@@ -23,11 +23,12 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Auth = () => {
   const { signIn, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   
   // Login state
   const [loginEmail, setLoginEmail] = useState("");
@@ -46,16 +47,24 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
-      await signIn(loginEmail, loginPassword);
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur Mariable !",
-      });
-    } catch (error: any) {
+
+    if (!loginEmail || !loginPassword) {
       toast({
         title: "Erreur de connexion",
-        description: error.message,
+        description: "Veuillez remplir tous les champs",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await signIn(loginEmail, loginPassword);
+    } catch (error: any) {
+      console.error("Login error:", error);
+      toast({
+        title: "Erreur de connexion",
+        description: "Email ou mot de passe incorrect",
         variant: "destructive",
       });
     } finally {
@@ -72,6 +81,10 @@ const Auth = () => {
         throw new Error("La date de mariage est requise");
       }
 
+      if (!email || !password || !firstName || !lastName || !weddingLocation || !estimatedBudget || !guestCount) {
+        throw new Error("Veuillez remplir tous les champs obligatoires");
+      }
+
       const userData = {
         firstName,
         lastName,
@@ -82,14 +95,11 @@ const Auth = () => {
       };
 
       await signUp(email, password, userData);
-      toast({
-        title: "Inscription réussie",
-        description: "Votre compte a été créé avec succès !",
-      });
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast({
         title: "Erreur lors de l'inscription",
-        description: error.message,
+        description: error.message || "Une erreur est survenue lors de l'inscription",
         variant: "destructive",
       });
     } finally {
